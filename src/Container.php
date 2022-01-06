@@ -42,7 +42,7 @@ class Container extends GenerateObject implements ContainerInterface {
      * @param string $class 类名
      * @param array $vars 构造函数参数
      * @param bool $isNew 是否重新生成对象
-     * @param callable|null $call
+     * @param callable|null $call 实例化后回调参数
      * @return object
      */
     public function make(string $class, array $vars = [], bool $isNew = false, ?callable $call = null): object {
@@ -79,11 +79,7 @@ class Container extends GenerateObject implements ContainerInterface {
      */
     public function has(string $id): bool {
         // TODO: Implement has() method.
-        if (empty($this->bind[$id]) || !$this->containers -> offsetExists($this->bind[$id])) {
-            $this->delete($id);
-            return false;
-        }
-        return true;
+        return !empty($this->bind[$id]);
     }
 
     /**

@@ -2,6 +2,7 @@
     "name": "iflow/container",
     "description": "iflow_container",
     "license": "MulanPSL-2.0",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "iflow\\Container\\": "src/"
