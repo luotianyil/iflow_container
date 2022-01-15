@@ -3,18 +3,21 @@
 namespace iflow\Container\implement\generate\traits;
 
 use iflow\Container\Container;
+use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use ReflectionNamedType;
 use ReflectionFunctionAbstract;
 use ReflectionProperty;
 use ReflectionParameter;
+use Reflector;
 
 trait GenerateParameters {
 
     /**
      * 生成绑定参数
-     * @param \ReflectionFunctionAbstract $method
+     * @param ReflectionFunctionAbstract $method
      * @param array $vars
      * @return array
+     * @throws InvokeClassException
      */
     public function GenerateBindParameters(ReflectionFunctionAbstract $method, array $vars = []): array {
         if (!$vars && $method -> getNumberOfParameters() === 0) return [];
@@ -34,7 +37,7 @@ trait GenerateParameters {
                     $args[] = array_shift($vars);
                 elseif ($parameter -> isDefaultValueAvailable())
                     $args[] = $parameter -> getDefaultValue();
-                else throw new \Error('method '. $method -> getName() .' param miss:' . $name);
+//                else throw new \Error('method '. $method -> getName() .' param miss:' . $name);
             }
         }
         return $args;
@@ -45,6 +48,7 @@ trait GenerateParameters {
      * @param string $className
      * @param array $vars
      * @return object
+     * @throws InvokeClassException
      */
     public function getObjectParam(string $className, array &$vars): object {
         $value = array_shift($vars);
@@ -53,10 +57,10 @@ trait GenerateParameters {
 
     /**
      * 获取参数类型
-     * @param ReflectionProperty|ReflectionParameter $property
+     * @param ReflectionProperty|ReflectionParameter|Reflector $property
      * @return array
      */
-    public function getParameterType(ReflectionProperty|ReflectionParameter $property): array {
+    public function getParameterType(ReflectionProperty|ReflectionParameter|Reflector $property): array {
         $type = $property -> getType();
         $types = [];
         if ($type instanceof \ReflectionUnionType) {

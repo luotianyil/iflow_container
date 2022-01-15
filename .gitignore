@@ -1,8 +1,10 @@
 /.idea
 /.vscode
 /.git
+/app
 /vendor
 /tests
+iflow
 composer.lock
 phpunit.xml
 .phpunit.result.cache

@@ -44,6 +44,7 @@ class Container extends GenerateObject implements ContainerInterface {
      * @param bool $isNew 是否重新生成对象
      * @param callable|null $call 实例化后回调参数
      * @return object
+     * @throws implement\generate\exceptions\InvokeClassException
      */
     public function make(string $class, array $vars = [], bool $isNew = false, ?callable $call = null): object {
 
@@ -60,6 +61,21 @@ class Container extends GenerateObject implements ContainerInterface {
     }
 
     /**
+     * 向容器内部注册对象
+     * @param string $name 对象名称
+     * @param object $object
+     * @param callable|null $call
+     * @return mixed
+     * @throws \Exception
+     */
+    public function register(string $name, object $object, ?callable $call = null): mixed {
+        if (isset($this->bind[$name])) throw new \Exception('name already exists in the container');
+        $this->bind[$name] = new \stdClass();
+        $this->containers -> offsetSet($this->bind[$name], $object);
+        return $call ? $call($object) : $object;
+    }
+
+    /**
      * 获取 容器 内对象
      * @param string $id
      * @return mixed
@@ -69,7 +85,7 @@ class Container extends GenerateObject implements ContainerInterface {
         if ($this->has($id)) {
             return $this->containers -> offsetGet($this->bind[$id]);
         }
-        throw new \Error('class not exists: '. $id);
+        throw new \Error('class does not exists in the container: '. $id);
     }
 
     /**
