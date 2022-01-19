@@ -13,6 +13,7 @@ class Value extends DataAbstract {
 
     public function process(Reflector $reflector, &$args): Reflector {
         // TODO: Implement process() method.
+        $args['parameters'] = $args['parameters'] ?? [];
         if ($reflector instanceof \ReflectionParameter) {
             $args['parameters'][$reflector -> getPosition()] = $this->getValue($reflector, args: $args['parameters']);
         } else {

@@ -31,13 +31,14 @@ class NotNull extends DataAbstract {
         try {
             // 获取初始化值
             $object = $reflector instanceof \ReflectionParameter ? null : $this->getObject($args);
-            $value = $this->getValue($reflector, $object, $args);
+
+            $args['parameters'] = $args['parameters'] ?? [];
+            $value = $this->getValue($reflector, $object, $args['parameters']);
 
             $type = Container::getInstance() -> getParameterType($reflector);
-
-            if (in_array('array', $type) && empty($type)) $this->throw_error($reflector);
+            if (in_array('array', $type) && empty($value)) $this->throw_error($reflector, 403);
             if (!is_null($value) && $value !== '') return true;
-            $this->throw_error($reflector);
+            $this->throw_error($reflector, 403);
         } catch (\Error) {
             $this->throw_error($reflector);
         }

@@ -7,6 +7,8 @@ use iflow\Container\implement\annotation\abstracts\AnnotationAbstract;
 use iflow\Container\implement\annotation\implement\initializer\FileSystem;
 use iflow\Container\implement\annotation\traits\Cache;
 use iflow\Container\implement\annotation\traits\Execute;
+use iflow\Container\implement\generate\exceptions\InvokeClassException;
+use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use ReflectionClass;
 use ReflectionException;
 use Reflector;
@@ -36,7 +38,7 @@ class Annotation extends AnnotationAbstract {
     /**
      * 初始化项目
      * @return void
-     * @throws exceptions\CacheException|ReflectionException
+     * @throws exceptions\CacheException|ReflectionException|InvokeFunctionException|InvokeClassException
      */
     protected function initializer(): void {
         if ($this->getCache()) $this->classes = $this->getCacheContent();
@@ -44,8 +46,8 @@ class Annotation extends AnnotationAbstract {
 
         foreach ($this->classes as $class) {
             $refClass = new ReflectionClass($class);
-            (new Execute()) -> getReflectorAttributes($refClass)
-            -> execute($refClass);
+            if ($refClass -> isTrait() || $refClass -> isAbstract()) continue;
+            (new Execute()) -> getReflectorAttributes($refClass) -> execute($refClass, [], false);
         }
     }
 

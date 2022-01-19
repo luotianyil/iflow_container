@@ -3,6 +3,7 @@
 namespace iflow\Container\implement\generate\traits;
 
 use iflow\Container\implement\annotation\traits\Execute;
+use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
@@ -14,10 +15,11 @@ trait InvokeFunction {
 
     /**
      * 反射执行方法
-     * @param array|string|\Closure $callable
+     * @param array|string|\Closure|ReflectionFunctionAbstract $callable
      * @param array $vars
      * @return mixed
      * @throws InvokeFunctionException
+     * @throws InvokeClassException
      */
     public function invoke(array|string|\Closure|ReflectionFunctionAbstract $callable, array $vars = []): mixed {
         if ($callable instanceof ReflectionFunctionAbstract) {

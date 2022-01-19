@@ -6,8 +6,11 @@ use Attribute;
 use iflow\Container\Container;
 use iflow\Container\implement\annotation\abstracts\AnnotationAbstract;
 use iflow\Container\implement\annotation\exceptions\AttributeTypeException;
+use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use ReflectionAttribute;
+use ReflectionClass;
+use ReflectionException;
 use Reflector;
 
 class Execute {
@@ -34,25 +37,28 @@ class Execute {
      * @param Reflector $reflection
      * @param ReflectionAttribute $reflectionAttribute
      * @return AnnotationAbstract
-     * @throws AttributeTypeException
+     * @throws AttributeTypeException|ReflectionException
      */
     protected function process(Reflector $reflection, ReflectionAttribute $reflectionAttribute): AnnotationAbstract {
-        $_attrObject = $reflectionAttribute -> newInstance();
+        $reflectionClass = new ReflectionClass($reflectionAttribute -> getName());
+        $_attrObject = $reflectionClass -> newInstance(...$reflectionAttribute -> getArguments());
         if (!$_attrObject instanceof AnnotationAbstract) throw new AttributeTypeException('object instanceof AnnotationAbstract has valid fail className: '. $reflectionAttribute -> getName());
-        return $_attrObject;
+        return Container::getInstance() -> GenerateClassParameters($reflectionClass, $_attrObject);
     }
 
     /**
      * 实例化对象， 执行全部注解
      * @param Reflector $reflector
      * @param array $vars
+     * @param bool $generateClassParameters
      * @return object
+     * @throws InvokeClassException
      * @throws InvokeFunctionException
      */
-    public function execute(Reflector $reflector, array $vars = []): object {
+    public function execute(Reflector $reflector, array $vars = [], bool $generateClassParameters = true): object {
         $container = Container::getInstance();
         $this -> executeAnnotationLifeProcess('beforeCreate', $reflector);
-        $_obj = $reflector -> newInstance();
+        $_obj = empty($vars) ? $reflector -> newInstance() : $reflector -> newInstance($vars);
         if (method_exists($_obj, '__make')) {
             $container -> invoke([$_obj, '__make'], [ $container, $reflector ]);
         }
@@ -61,7 +67,7 @@ class Execute {
 
         // 执行创建回调以及挂载结束注解
         $this -> executeAnnotationLifeProcess(['Created', 'beforeMounted'], $reflector, $args);
-        $_obj = $container -> GenerateClassParameters($reflector, $_obj);
+        if ($generateClassParameters) $_obj = $container -> GenerateClassParameters($reflector, $_obj);
 
         $this -> executeAnnotationLifeProcess('Mounted', $reflector, $args);
         return $_obj;
@@ -71,7 +77,7 @@ class Execute {
      * 获取当前可执行数据注解列表
      * @param Reflector $reflection
      * @return array
-     * @throws AttributeTypeException
+     * @throws AttributeTypeException|ReflectionException
      */
     protected function readExecuteAnnotation(Reflector $reflection): array {
         $attributes = $reflection -> getAttributes();

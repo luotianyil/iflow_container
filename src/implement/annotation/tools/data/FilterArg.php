@@ -5,6 +5,7 @@ namespace iflow\Container\implement\annotation\tools\data;
 use Attribute;
 use iflow\Container\Container;
 use iflow\Container\implement\annotation\tools\data\abstracts\DataAbstract;
+use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use Reflector;
 
@@ -35,7 +36,7 @@ class FilterArg extends DataAbstract {
     /**
      * @param $closure
      * @return mixed
-     * @throws InvokeFunctionException
+     * @throws InvokeFunctionException|InvokeClassException
      */
     protected function called($closure): mixed {
         $container = Container::getInstance();

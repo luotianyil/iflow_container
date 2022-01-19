@@ -85,8 +85,8 @@ abstract class DataAbstract extends AnnotationAbstract {
      * 抛出异常
      * @throws ValueException
      */
-    protected function throw_error($ref) {
-        throw new ValueException($this->error ?: "{$ref -> getName()} required");
+    protected function throw_error(Reflector $ref, int $code = 502) {
+        throw new ValueException($this->error ?: "{$ref -> getName()} required", $code);
     }
 
 }
