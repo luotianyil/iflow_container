@@ -47,7 +47,7 @@ class Annotation extends AnnotationAbstract {
         foreach ($this->classes as $class) {
             $refClass = new ReflectionClass($class);
             if ($refClass -> isTrait() || $refClass -> isAbstract()) continue;
-            (new Execute()) -> getReflectorAttributes($refClass) -> execute($refClass, [], false);
+            (new Execute()) -> getReflectorAttributes($refClass) -> execute($refClass, [], true);
         }
     }
 

@@ -59,7 +59,12 @@ class Execute {
     public function execute(Reflector $reflector, array $vars = [], bool $initializer = false): object {
         $container = Container::getInstance();
         $this -> executeAnnotationLifeProcess('beforeCreate', $reflector);
-        $_obj = empty($vars) ? $reflector -> newInstance() : $reflector -> newInstance($vars);
+
+        // 初始化构造函数参数
+        $constructor = $reflector -> getConstructor();
+        $vars = $constructor ? $container->GenerateBindParameters($constructor, $vars) : [];
+        $_obj = $reflector -> newInstanceArgs($vars);
+
         if (method_exists($_obj, '__make')) {
             $container -> invoke([$_obj, '__make'], [ $container, $reflector ]);
         }
@@ -72,7 +77,7 @@ class Execute {
         // 非初始化时挂在完毕后执行注解
         if (!$initializer) $this -> executeAnnotationLifeProcess('InitializerNonExecute', $reflector, $args);
 
-        $_obj = $container -> GenerateClassParameters($reflector, $_obj);
+        $_obj = $container -> GenerateClassParameters($reflector, $_obj, $initializer);
 
         $this -> executeAnnotationLifeProcess('Mounted', $reflector, $args);
         return $_obj;

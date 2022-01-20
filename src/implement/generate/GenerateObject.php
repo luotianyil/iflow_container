@@ -33,23 +33,9 @@ class GenerateObject implements GenerateInterface {
             $execute = new Execute();
             $class = str_replace('\\\\', '\\', $class);
             $ref = new ReflectionClass($class);
-
-            $execute -> getReflectorAttributes($ref)
-                -> executeAnnotationLifeProcess('beforeCreate', $ref);
-
-            $constructor = $ref -> getConstructor();
-            $vars = $constructor ? $this->GenerateBindParameters($constructor, $vars) : [];
-            $object = $ref -> newInstanceArgs($vars);
-
-            $args = [ $object ];
-            $execute -> executeAnnotationLifeProcess(['Created', 'beforeMounted'], $ref, $args);
-            if ($ref -> hasMethod('__make')) $this->invoke([$object, '__make'], $vars);
-
-            $this -> GenerateClassParameters($ref, $object);
-            $execute -> executeAnnotationLifeProcess('Mounted', $ref, $args);
-            return $object;
+            return $execute -> getReflectorAttributes($ref) -> execute($ref, $vars);
         } catch (ReflectionException $exception) {
-            throw new InvokeClassException('Class not exists: ' . $class . $exception -> getMessage());
+            throw new InvokeClassException('Class not exists: ' . $class . '  ' . $exception -> getMessage());
         }
     }
 
