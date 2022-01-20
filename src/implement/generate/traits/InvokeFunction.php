@@ -39,7 +39,7 @@ trait InvokeFunction {
      * @param string|\Closure $callable
      * @param array $vars
      * @return mixed
-     * @throws InvokeFunctionException
+     * @throws InvokeFunctionException|InvokeClassException
      */
     public function invokeFunction(string|\Closure $callable, array $vars = []): mixed {
         try {
@@ -62,6 +62,7 @@ trait InvokeFunction {
      * @param array|string $methods
      * @param array $vars
      * @return mixed
+     * @throws InvokeClassException
      */
     protected function invokeMethod(array|string $methods, array $vars = []): mixed {
         [$class, $methods] = is_array($methods) ? $methods : explode('::', $methods);
@@ -111,11 +112,18 @@ trait InvokeFunction {
      * 获取参数注解
      * @param ReflectionProperty|ReflectionParameter|ReflectionFunctionAbstract $reflection
      * @param array $args
+     * @param bool $initializer
      * @return array
      */
-    protected function executePropertyAnnotation(ReflectionProperty|ReflectionParameter|ReflectionFunctionAbstract $reflection, array &$args = []): array {
+    protected function executePropertyAnnotation(
+        ReflectionProperty|ReflectionParameter|ReflectionFunctionAbstract $reflection,
+        array &$args = [],
+        bool $initializer = false
+    ): array {
+        $executeLife = [ 'beforeCreate', 'Created', 'beforeMounted', 'Mounted', 'InitializerNonExecute' ];
+        if ($initializer) array_pop($executeLife);
         $execute = new Execute();
         return $execute -> getReflectorAttributes($reflection)
-            -> executeAnnotationLifeProcess(['beforeCreate', 'Created', 'beforeMounted', 'Mounted'], $reflection, $args);
+            -> executeAnnotationLifeProcess($executeLife, $reflection, $args);
     }
 }

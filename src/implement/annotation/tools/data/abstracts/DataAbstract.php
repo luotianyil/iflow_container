@@ -5,6 +5,7 @@ namespace iflow\Container\implement\annotation\tools\data\abstracts;
 use Error;
 use iflow\Container\Container;
 use iflow\Container\implement\annotation\abstracts\AnnotationAbstract;
+use iflow\Container\implement\annotation\implement\enum\AnnotationEnum;
 use iflow\Container\implement\annotation\tools\data\exceptions\ValueException;
 use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use ReflectionException;
@@ -13,6 +14,8 @@ use ReflectionProperty;
 use Reflector;
 
 abstract class DataAbstract extends AnnotationAbstract {
+
+    public AnnotationEnum $hookEnum = AnnotationEnum::InitializerNonExecute;
 
     // 变量默认值
     protected mixed $default = '';

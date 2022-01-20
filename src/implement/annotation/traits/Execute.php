@@ -23,7 +23,8 @@ class Execute {
         'beforeCreate' => [],
         'Created' => [],
         'beforeMounted' => [],
-        'Mounted' => []
+        'Mounted' => [],
+        'InitializerNonExecute' => []
     ];
 
     public function getReflectorAttributes(Reflector $reflection): static {
@@ -50,12 +51,12 @@ class Execute {
      * 实例化对象， 执行全部注解
      * @param Reflector $reflector
      * @param array $vars
-     * @param bool $generateClassParameters
+     * @param bool $initializer
      * @return object
      * @throws InvokeClassException
      * @throws InvokeFunctionException
      */
-    public function execute(Reflector $reflector, array $vars = [], bool $generateClassParameters = true): object {
+    public function execute(Reflector $reflector, array $vars = [], bool $initializer = false): object {
         $container = Container::getInstance();
         $this -> executeAnnotationLifeProcess('beforeCreate', $reflector);
         $_obj = empty($vars) ? $reflector -> newInstance() : $reflector -> newInstance($vars);
@@ -67,7 +68,11 @@ class Execute {
 
         // 执行创建回调以及挂载结束注解
         $this -> executeAnnotationLifeProcess(['Created', 'beforeMounted'], $reflector, $args);
-        if ($generateClassParameters) $_obj = $container -> GenerateClassParameters($reflector, $_obj);
+
+        // 非初始化时挂在完毕后执行注解
+        if (!$initializer) $this -> executeAnnotationLifeProcess('InitializerNonExecute', $reflector, $args);
+
+        $_obj = $container -> GenerateClassParameters($reflector, $_obj);
 
         $this -> executeAnnotationLifeProcess('Mounted', $reflector, $args);
         return $_obj;

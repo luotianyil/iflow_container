@@ -4,6 +4,7 @@ namespace iflow\Container\implement\annotation\tools\data;
 
 use Attribute;
 use iflow\Container\Container;
+use iflow\Container\implement\annotation\implement\enum\AnnotationEnum;
 use iflow\Container\implement\annotation\tools\data\abstracts\DataAbstract;
 use iflow\Container\implement\annotation\tools\data\exceptions\ValueException;
 use iflow\Container\implement\generate\exceptions\InvokeClassException;
@@ -13,10 +14,9 @@ use Reflector;
 #[Attribute(Attribute::TARGET_PARAMETER|Attribute::TARGET_PROPERTY)]
 class NotNull extends DataAbstract {
 
-    public function __construct(
-        protected mixed $value = "",
-        protected string $error = ""
-    ) {}
+    public AnnotationEnum $hookEnum = AnnotationEnum::InitializerNonExecute;
+
+    public function __construct(protected mixed $value = "", protected string $error = "") {}
 
     /**
      * @param Reflector $reflector

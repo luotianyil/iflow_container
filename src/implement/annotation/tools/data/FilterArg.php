@@ -20,7 +20,7 @@ class FilterArg extends DataAbstract {
 
     public function process(Reflector $reflector, &$args): mixed {
         // TODO: Implement process() method.
-        $object = $reflector instanceof \ReflectionParameter ? null : $args[count($args) - 1];
+        $object = $reflector instanceof \ReflectionParameter ? null : $this->getObject($args);
         $value = $this->getValue($reflector, $object, $args);
 
         if ($reflector instanceof \ReflectionProperty) {

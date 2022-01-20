@@ -16,7 +16,7 @@ class GenerateObject implements GenerateInterface {
 
     /**
      * 实例化对象
-     * @throws InvokeClassException
+     * @throws InvokeClassException|exceptions\InvokeFunctionException
      */
     public function make(string $class, array $vars = []): object {
         // TODO: Implement make() method.
@@ -57,12 +57,13 @@ class GenerateObject implements GenerateInterface {
      * 加载变量注解并执行
      * @param ReflectionClass|Reflector $reflectionClass
      * @param object $object
+     * @param bool $initializer 是否为初始化注解执行
      * @return object
      */
-    public function GenerateClassParameters(ReflectionClass|Reflector $reflectionClass, object $object): object {
+    public function GenerateClassParameters(ReflectionClass|Reflector $reflectionClass, object $object, bool $initializer = false): object {
         foreach ($reflectionClass -> getProperties() as $property) {
             $args = [ $object ];
-            $this->executePropertyAnnotation($property, $args);
+            $this->executePropertyAnnotation($property, $args, $initializer);
         }
         return $object;
     }
