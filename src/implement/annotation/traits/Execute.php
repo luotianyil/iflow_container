@@ -109,21 +109,16 @@ class Execute {
     /**
      * 执行指定生命周期注解方法
      * @param string|array $lifeName
-     * @param Reflector $reflectionClass
+     * @param Reflector $reflector
      * @param array $args
      * @return array
      */
-    public function executeAnnotationLifeProcess(string|array $lifeName, Reflector &$reflectionClass, array &$args = []): array {
-        if (!is_array($lifeName)) return array_map(
-            function ($_attribute) use (&$reflectionClass, &$args) { $_attribute -> process($reflectionClass, $args); },
-            $this->life[$lifeName]
-        );
+    public function executeAnnotationLifeProcess(string|array $lifeName, Reflector &$reflector, array &$args = []): array {
+        if (!is_array($lifeName)) $lifeName = [ $lifeName ];
 
         $returns = [];
         foreach ($lifeName as $name) {
-            $returns[] = array_map(
-                function ($_attribute) use (&$reflectionClass, &$args) { $_attribute -> process($reflectionClass, $args); },
-                $this->life[$name]);
+            $returns[] = array_map(fn ($_attribute) => $_attribute -> process($reflector, $args),  $this->life[$name] ?? []);
         }
         return $returns;
     }

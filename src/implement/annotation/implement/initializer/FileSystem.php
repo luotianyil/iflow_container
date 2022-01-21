@@ -14,7 +14,7 @@ class FileSystem {
      * @return array
      */
     public function loadFileList(string $dir, string $ext = '', bool $traverse = false) : array {
-        $this->ext = $ext?:$this->ext;
+        $this->ext = $ext ?: $this->ext;
         if (!$traverse) return glob($dir . '*' . $this->ext);
         return match (is_dir($dir)) {
             true => $this->loadDirFile($dir),
@@ -35,6 +35,7 @@ class FileSystem {
             if (is_dir($file -> getPathname())) {
                 $fileList[$file -> getBasename()] = $this->loadDirFile($file -> getPathname());
             } else {
+                if (pathinfo($file -> getExtension()) !== $this->ext) continue;
                 $fileList[str_replace($this->ext, '', $file -> getBasename())] = $file -> getPathname();
             }
         }

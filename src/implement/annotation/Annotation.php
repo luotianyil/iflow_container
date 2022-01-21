@@ -7,8 +7,6 @@ use iflow\Container\implement\annotation\abstracts\AnnotationAbstract;
 use iflow\Container\implement\annotation\implement\initializer\FileSystem;
 use iflow\Container\implement\annotation\traits\Cache;
 use iflow\Container\implement\annotation\traits\Execute;
-use iflow\Container\implement\generate\exceptions\InvokeClassException;
-use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use ReflectionClass;
 use ReflectionException;
 use Reflector;
@@ -38,7 +36,7 @@ class Annotation extends AnnotationAbstract {
     /**
      * 初始化项目
      * @return void
-     * @throws exceptions\CacheException|ReflectionException|InvokeFunctionException|InvokeClassException
+     * @throws exceptions\CacheException|ReflectionException
      */
     protected function initializer(): void {
         if ($this->getCache()) $this->classes = $this->getCacheContent();
@@ -47,7 +45,8 @@ class Annotation extends AnnotationAbstract {
         foreach ($this->classes as $class) {
             $refClass = new ReflectionClass($class);
             if ($refClass -> isTrait() || $refClass -> isAbstract()) continue;
-            (new Execute()) -> getReflectorAttributes($refClass) -> execute($refClass, [], true);
+            (new Execute()) -> getReflectorAttributes($refClass)
+                -> executeAnnotationLifeProcess(['beforeCreate', 'Created', 'beforeMounted', 'Mounted'], $refClass);
         }
     }
 
@@ -79,7 +78,7 @@ class Annotation extends AnnotationAbstract {
                 if (sizeof($value) > 0) $this->filePathToClass($value, $nameSpace.'\\'.$key, $projectRoot);
             } elseif (file_exists($value)) {
                 $class = str_replace([ '.php', $projectRoot, '/' ], [ '', '', '\\' ], $value);
-                if (class_exists($class) || !in_array($class, $this->classes)) $this->classes[] = $class;
+                if (class_exists($class) && !in_array($class, $this->classes)) $this->classes[] = $class;
             }
         }
         return $this->classes;
