@@ -95,7 +95,7 @@ class Container extends GenerateObject implements ContainerInterface {
      */
     public function has(string $id): bool {
         // TODO: Implement has() method.
-        return !empty($this->bind[$id]);
+        return !empty($this->bind[$id]) && $this->containers -> offsetExists($this->bind[$id]);
     }
 
     /**
