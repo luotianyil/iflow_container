@@ -22,6 +22,11 @@ class Value extends DataAbstract {
         } else {
             $object = $this -> getObject($args);
             if (!is_object($object)) return $reflector;
+
+            if (!$reflector ->  isPublic()) {
+                $reflector ->  setAccessible(true);
+            }
+
             $reflector -> setValue($object, $this->getValue($reflector, $object));
         }
         return $reflector;
