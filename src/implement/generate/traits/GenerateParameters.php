@@ -4,6 +4,7 @@ namespace iflow\Container\implement\generate\traits;
 
 use iflow\Container\Container;
 use iflow\Container\implement\generate\exceptions\InvokeClassException;
+use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use ReflectionNamedType;
 use ReflectionFunctionAbstract;
 use ReflectionProperty;
@@ -17,7 +18,7 @@ trait GenerateParameters {
      * @param ReflectionFunctionAbstract $method
      * @param array $vars
      * @return array
-     * @throws InvokeClassException
+     * @throws InvokeClassException|InvokeFunctionException
      */
     public function GenerateBindParameters(ReflectionFunctionAbstract $method, array $vars = []): array {
         if (!$vars && $method -> getNumberOfParameters() === 0) return [];
@@ -48,7 +49,7 @@ trait GenerateParameters {
      * @param string $className
      * @param array $vars
      * @return object
-     * @throws InvokeClassException
+     * @throws InvokeClassException|InvokeFunctionException
      */
     public function getObjectParam(string $className, array &$vars): object {
         $value = array_shift($vars);
@@ -63,11 +64,27 @@ trait GenerateParameters {
     public function getParameterType(ReflectionProperty|ReflectionParameter|Reflector $property): array {
         $type = $property -> getType();
         $types = [];
-        if ($type instanceof \ReflectionUnionType) {
+
+        if ($type && method_exists($type, 'getTypes')) {
             $types = array_map(fn($info): string => $info -> getName(), $type -> getTypes());
         } else if ($type instanceof ReflectionNamedType) {
             $types[] = $type -> getName();
         }
+
         return $types ?: [ 'mixed' ];
+    }
+
+    /**
+     * 检测类型是否为接口或对象
+     * @param string $typeName
+     * @return string
+     */
+    public function checkTypeNameByClassOrInterface(string $typeName): string {
+        try {
+            $typeReflection = new \ReflectionClass($typeName);
+            return $typeReflection -> isInterface() ? 'interface' : 'class';
+        } catch (\ReflectionException $exception) {
+            return $typeName;
+        }
     }
 }

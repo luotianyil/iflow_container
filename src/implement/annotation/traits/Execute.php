@@ -27,6 +27,13 @@ class Execute {
         'InitializerNonExecute' => []
     ];
 
+    /**
+     * 获取当前反射对象内的所有注解
+     * @param Reflector $reflection
+     * @return $this
+     * @throws AttributeTypeException
+     * @throws ReflectionException
+     */
     public function getReflectorAttributes(Reflector $reflection): static {
         if ($reflection -> getName() === Attribute::class) return $this;
         $this->readExecuteAnnotation($reflection);

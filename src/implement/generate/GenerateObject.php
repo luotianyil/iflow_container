@@ -2,6 +2,7 @@
 
 namespace iflow\Container\implement\generate;
 
+use iflow\Container\implement\annotation\exceptions\AttributeTypeException;
 use iflow\Container\implement\annotation\traits\Execute;
 use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use iflow\Container\implement\generate\interfaces\GenerateInterface;
@@ -16,7 +17,7 @@ class GenerateObject implements GenerateInterface {
 
     /**
      * 实例化对象
-     * @throws InvokeClassException|exceptions\InvokeFunctionException
+     * @throws InvokeClassException|exceptions\InvokeFunctionException|AttributeTypeException
      */
     public function make(string $class, array $vars = []): object {
         // TODO: Implement make() method.
@@ -25,7 +26,11 @@ class GenerateObject implements GenerateInterface {
 
     /**
      * 反射执行方法类
-     * @throws InvokeClassException|exceptions\InvokeFunctionException
+     * @param class-string|string $class
+     * @param array $vars
+     * @template T
+     * @return T
+     *@throws InvokeClassException|exceptions\InvokeFunctionException|AttributeTypeException
      */
     public function invokeClass(string $class, array $vars = []): object {
         // TODO: Implement invokeClass() method.

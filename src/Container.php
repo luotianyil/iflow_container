@@ -3,6 +3,9 @@
 namespace iflow\Container;
 
 use iflow\Container\implement\generate\GenerateObject;
+use iflow\Container\implement\generate\exceptions\InvokeClassException;
+use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
+use iflow\Container\implement\annotation\exceptions\AttributeTypeException;
 use Psr\Container\ContainerInterface;
 
 class Container extends GenerateObject implements ContainerInterface {
@@ -39,12 +42,12 @@ class Container extends GenerateObject implements ContainerInterface {
 
     /**
      * 实例化对象
-     * @param string $class 类名
+     * @param string|class-string $class 类名
      * @param array $vars 构造函数参数
      * @param bool $isNew 是否重新生成对象
      * @param callable|null $call 实例化后回调参数
      * @return object
-     * @throws implement\generate\exceptions\InvokeClassException
+     * @throws InvokeClassException|InvokeFunctionException|AttributeTypeException
      */
     public function make(string $class, array $vars = [], bool $isNew = false, ?callable $call = null): object {
 
@@ -62,7 +65,7 @@ class Container extends GenerateObject implements ContainerInterface {
 
     /**
      * 向容器内部注册对象
-     * @param string $name 对象名称
+     * @param string|class-string $name 对象名称
      * @param object $object
      * @param callable|null $call
      * @return mixed
@@ -77,7 +80,7 @@ class Container extends GenerateObject implements ContainerInterface {
 
     /**
      * 获取 容器 内对象
-     * @param string $id
+     * @param string|class-string $id
      * @return mixed
      */
     public function get(string $id): object {
@@ -103,7 +106,10 @@ class Container extends GenerateObject implements ContainerInterface {
      * @param string $id
      * @return void
      */
-    public function delete(string $id) {
-        if (!empty($this->bind[$id])) unset($this->bind[$id]);
+    public function delete(string $id): void {
+        if (!empty($this->bind[$id])) {
+            $this->containers -> offsetUnset($this->bind[$id]);
+            unset($this->bind[$id]);
+        }
     }
 }
