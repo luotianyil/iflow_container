@@ -9,6 +9,7 @@ use ReflectionNamedType;
 use ReflectionFunctionAbstract;
 use ReflectionProperty;
 use ReflectionParameter;
+use ReflectionType;
 use Reflector;
 
 trait GenerateParameters {
@@ -59,10 +60,11 @@ trait GenerateParameters {
     /**
      * 获取参数类型
      * @param ReflectionProperty|ReflectionParameter|Reflector $property
+     * @param string $getTypeMethod
      * @return array
      */
-    public function getParameterType(ReflectionProperty|ReflectionParameter|Reflector $property): array {
-        $type = $property -> getType();
+    public function getParameterType(ReflectionProperty|ReflectionParameter|Reflector $property, string $getTypeMethod = 'getType'): array {
+        $type = call_user_func([ $property, $getTypeMethod ]);
         $types = [];
 
         if ($type && method_exists($type, 'getTypes')) {
@@ -72,6 +74,16 @@ trait GenerateParameters {
         }
 
         return $types ?: [ 'mixed' ];
+    }
+
+    /**
+     * 类型转字符串
+     * @param string $parameterName
+     * @param array $type
+     * @return string
+     */
+    public function parameterTypeToStr(string $parameterName = '', array $type = []): string {
+        return sprintf('%s%s', implode('|', $type), $parameterName ? ' $'.$parameterName : '');
     }
 
     /**

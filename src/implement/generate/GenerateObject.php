@@ -6,14 +6,14 @@ use iflow\Container\implement\annotation\exceptions\AttributeTypeException;
 use iflow\Container\implement\annotation\traits\Execute;
 use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use iflow\Container\implement\generate\interfaces\GenerateInterface;
-use iflow\Container\implement\generate\traits\InvokeFunction;
+use iflow\Container\implement\generate\traits\{ InvokeFunction, GenerateObjectTrait };
 use ReflectionClass;
 use ReflectionException;
 use Reflector;
 
 class GenerateObject implements GenerateInterface {
 
-    use InvokeFunction;
+    use InvokeFunction, GenerateObjectTrait;
 
     /**
      * 实例化对象
