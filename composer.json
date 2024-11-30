@@ -5,8 +5,7 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "iflow\\Container\\": "src/",
-            "app\\": "app"
+            "iflow\\Container\\": "src/"
         }
     },
     "autoload-dev": {
