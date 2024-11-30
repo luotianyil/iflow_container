@@ -3,13 +3,13 @@
 namespace iflow\Container\implement\generate\traits;
 
 use iflow\Container\Container;
+use iflow\Container\implement\annotation\exceptions\AttributeTypeException;
 use iflow\Container\implement\generate\exceptions\InvokeClassException;
 use iflow\Container\implement\generate\exceptions\InvokeFunctionException;
 use ReflectionNamedType;
 use ReflectionFunctionAbstract;
 use ReflectionProperty;
 use ReflectionParameter;
-use ReflectionType;
 use Reflector;
 
 trait GenerateParameters {
@@ -27,34 +27,42 @@ trait GenerateParameters {
 
         reset($vars);
 
-        $type = key($vars) === 0 ? 1 : 0;
         $args = [];
-        foreach ($parameters as $parameter) {
-            $name = $parameter -> getName();
+        array_walk_recursive($parameters, function (ReflectionParameter $parameter) use (&$vars, &$args, &$type) {
             $types = $this->getParameterType($parameter);
-            if (count($types) > 0) {
-                if (class_exists($types[0]))
-                    $args[] = $this->getObjectParam($types[0], $vars);
-                elseif (1 == $type && !empty($vars))
-                    $args[] = array_shift($vars);
-                elseif ($parameter -> isDefaultValueAvailable())
-                    $args[] = $parameter -> getDefaultValue();
-//                else throw new \Error('method '. $method -> getName() .' param miss:' . $name);
+
+            if (count($types) === 0 || empty($vars)) {
+                if ($parameter -> isDefaultValueAvailable()) $args[] = $parameter -> getDefaultValue();
+                return;
             }
-        }
+
+            $args[] = $this->getObjectParam($types, $vars);
+        });
         return $args;
     }
 
     /**
      * 获取方法参数 返回实例化
-     * @param string $className
+     * @param string|array $propertyTypes
      * @param array $vars
      * @return object
-     * @throws InvokeClassException|InvokeFunctionException
+     * @throws AttributeTypeException
+     * @throws InvokeClassException
+     * @throws InvokeFunctionException
      */
-    public function getObjectParam(string $className, array &$vars): object {
-        $value = array_shift($vars);
-        return $value instanceof $className ? $value : Container::getInstance() -> make($className);
+    public function getObjectParam(string|array $propertyTypes, array &$vars): mixed {
+        $value = null;
+        if (!empty($vars)) {
+            $value = array_shift($vars);
+            $propertyTypes = is_string($propertyTypes) ? [ $propertyTypes ] : $propertyTypes;
+
+            foreach ($propertyTypes as $type) {
+                if ($value instanceof $type) return $value;
+            }
+        }
+
+        if (class_exists($propertyTypes[0])) $value = Container::getInstance() -> make($propertyTypes[0]);
+        return $value;
     }
 
     /**

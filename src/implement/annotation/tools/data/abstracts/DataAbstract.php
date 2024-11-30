@@ -24,12 +24,11 @@ abstract class DataAbstract extends AnnotationAbstract {
 
     /**
      * 获取当前值
-     * @param Reflector $ref
+     * @param ReflectionProperty|ReflectionParameter $ref
      * @param object|null $object
      * @param array $args
      * @return mixed
      * @throws InvokeClassException
-     * @throws ReflectionException
      */
     public function getValue(Reflector $ref, object|null $object = null, array &$args = []): mixed
     {
@@ -42,8 +41,9 @@ abstract class DataAbstract extends AnnotationAbstract {
 
             return $value ?: throw new \Exception('method miss params null');
         } catch (Error|\Exception) {
-            if ($refIsProperty) return $ref -> getDefaultValue() ?: $this->defaultIsClass();
             // 当方法参数 不存在且无默认值时
+            if ($refIsProperty) return $ref -> getDefaultValue() ?: $this->defaultIsClass();
+
             return (
                 $ref -> isDefaultValueAvailable() ? $ref -> getDefaultValue() : null
             ) ?: $this->defaultIsClass();

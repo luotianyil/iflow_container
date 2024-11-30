@@ -10,17 +10,26 @@ use Psr\Container\ContainerInterface;
 
 class Container extends GenerateObject implements ContainerInterface {
 
-    // 实例化对象容器管理
-    protected ?\WeakMap $containers = null;
+    /**
+     * 实例化对象容器管理
+     * @var \WeakMap
+     */
+    protected \WeakMap $containers;
 
-    // 实例化对象列表
+    /**
+     * 已实例化对象列表
+     * @var array
+     */
     protected array $bind = [];
 
-    // 当前容器
+    /**
+     * 当前容器
+     * @var Container|null
+     */
     protected static ?Container $instance = null;
 
     public function __construct() {
-        $this->containers = $this->containers ?: new \WeakMap();
+        $this->containers ??= new \WeakMap();
         $this->initializer();
     }
 

@@ -44,13 +44,16 @@ class Execute {
      * 初始化注解信息
      * @param Reflector $reflection
      * @param ReflectionAttribute $reflectionAttribute
-     * @return AnnotationAbstract
+     * @return object|AnnotationAbstract
      * @throws AttributeTypeException|ReflectionException
      */
     protected function process(Reflector $reflection, ReflectionAttribute $reflectionAttribute): AnnotationAbstract {
         $reflectionClass = new ReflectionClass($reflectionAttribute -> getName());
         $_attrObject = $reflectionClass -> newInstance(...$reflectionAttribute -> getArguments());
-        if (!$_attrObject instanceof AnnotationAbstract) throw new AttributeTypeException('object instanceof AnnotationAbstract has valid fail className: '. $reflectionAttribute -> getName());
+
+        if (!$_attrObject instanceof AnnotationAbstract)
+            throw new AttributeTypeException('object instanceof AnnotationAbstract has valid fail className: '. $reflectionAttribute -> getName());
+
         return Container::getInstance() -> GenerateClassParameters($reflectionClass, $_attrObject);
     }
 

@@ -50,9 +50,7 @@ class Annotation extends AnnotationAbstract {
                 continue;
 
             (new Execute()) -> getReflectorAttributes($refClass)
-                -> executeAnnotationLifeProcess(
-                    ['beforeCreate', 'Created', 'beforeMounted', 'Mounted'], $refClass
-                );
+                -> executeAnnotationLifeProcess(['beforeCreate', 'Created', 'beforeMounted', 'Mounted'], $refClass);
         }
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Iflow\Container\implement\generate\interfaces;
+namespace iflow\Container\implement\generate\interfaces;
 
 interface GenerateInterface {
 
@@ -8,7 +8,6 @@ interface GenerateInterface {
      * 创建实例
      * @param string $class
      * @param array $vars
-     * @param bool $isNew
      * @return object
      */
     public function make(string $class, array $vars = []): object;
