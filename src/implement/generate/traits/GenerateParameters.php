@@ -28,16 +28,24 @@ trait GenerateParameters {
         reset($vars);
 
         $args = [];
-        array_walk_recursive($parameters, function (ReflectionParameter $parameter) use (&$vars, &$args, &$type) {
+        array_walk_recursive($parameters, function (ReflectionParameter $parameter) use ($method, &$vars, &$args, &$type) {
+            $name  = $parameter -> getName();
             $types = $this->getParameterType($parameter);
 
-            if (count($types) === 0 || empty($vars)) {
-                if ($parameter -> isDefaultValueAvailable()) $args[] = $parameter -> getDefaultValue();
-                return;
-            }
+            try {
+                if (count($types) === 0 || empty($vars)) {
+                    if ($parameter -> isDefaultValueAvailable()) {
+                        $args[] = $parameter -> getDefaultValue();
+                        return;
+                    }
+                }
 
-            $args[] = $this->getObjectParam($types, $vars);
+                $args[] = $this->getObjectParam($types, $vars);
+            } catch (InvokeFunctionException) {
+                throw new InvokeFunctionException('Method: ' . $method -> getName() . ' Parameter Args Miss: '. $name);
+            }
         });
+
         return $args;
     }
 
@@ -51,7 +59,7 @@ trait GenerateParameters {
      * @throws InvokeFunctionException
      */
     public function getObjectParam(string|array $propertyTypes, array &$vars): mixed {
-        $value = null;
+
         if (!empty($vars)) {
             $value = array_shift($vars);
             $propertyTypes = is_string($propertyTypes) ? [ $propertyTypes ] : $propertyTypes;
@@ -59,10 +67,14 @@ trait GenerateParameters {
             foreach ($propertyTypes as $type) {
                 if ($value instanceof $type) return $value;
             }
+            if (!is_object($value)) return $value;
         }
 
-        if (class_exists($propertyTypes[0])) $value = Container::getInstance() -> make($propertyTypes[0]);
-        return $value;
+        $class = array_filter($propertyTypes, fn($propertyType) => class_exists($propertyType))[0] ?? '';
+
+        return $class
+            ? Container::getInstance() -> make($class)
+            : throw new InvokeFunctionException('Method Parameter Args Miss');
     }
 
     /**
