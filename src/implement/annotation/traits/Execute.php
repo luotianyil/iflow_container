@@ -75,10 +75,6 @@ class Execute {
         $vars = $constructor ? $container->GenerateBindParameters($constructor, $vars) : [];
         $_obj = $reflector -> newInstanceArgs($vars);
 
-        if (method_exists($_obj, '__make')) {
-            $container -> invoke([$_obj, '__make'], [ $container, $reflector ]);
-        }
-
         $args = [ $_obj ];
 
         // 执行创建回调以及挂载结束注解
@@ -88,6 +84,10 @@ class Execute {
         if (!$initializer) $this -> executeAnnotationLifeProcess('InitializerNonExecute', $reflector, $args);
 
         $_obj = $container -> GenerateClassParameters($reflector, $_obj, $initializer);
+
+        if (method_exists($_obj, '__make')) {
+            $container -> invoke([$_obj, '__make'], [ $container, $reflector ]);
+        }
 
         $this -> executeAnnotationLifeProcess('Mounted', $reflector, $args);
         return $_obj;
