@@ -61,14 +61,8 @@ trait GenerateParameters {
     public function getObjectParam(string|array $propertyTypes, array &$vars): mixed {
 
         if (!empty($vars)) {
-            $value = array_shift($vars);
-            $propertyTypes = is_string($propertyTypes) ? [ $propertyTypes ] : $propertyTypes;
-
-            if (is_object($value)) return $value;
-
-            foreach ($propertyTypes as $type) {
-                if ($value instanceof $type) return $value;
-            }
+            // $propertyTypes = is_string($propertyTypes) ? [ $propertyTypes ] : $propertyTypes;
+            return array_shift($vars);
         }
 
         $class = array_filter($propertyTypes, fn($propertyType) => class_exists($propertyType))[0] ?? '';
