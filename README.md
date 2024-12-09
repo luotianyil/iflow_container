@@ -17,7 +17,7 @@ use iflow\Container\Container;
 $container = Container::getInstance();
 
 // 新建对象
-$container -> make('class', ...$args, call: function ($object) { return $object });
+$container -> make('class', $args, call: function ($object) { return $object });
 
 // 将已实例化的对象写入容器
 $container -> register('class', $obj);

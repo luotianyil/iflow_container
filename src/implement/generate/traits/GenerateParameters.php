@@ -64,10 +64,11 @@ trait GenerateParameters {
             $value = array_shift($vars);
             $propertyTypes = is_string($propertyTypes) ? [ $propertyTypes ] : $propertyTypes;
 
+            if (is_object($value)) return $value;
+
             foreach ($propertyTypes as $type) {
                 if ($value instanceof $type) return $value;
             }
-            if (!is_object($value)) return $value;
         }
 
         $class = array_filter($propertyTypes, fn($propertyType) => class_exists($propertyType))[0] ?? '';
@@ -119,4 +120,20 @@ trait GenerateParameters {
             return $typeName;
         }
     }
+
+    /**
+     * 通过参数类型获取默认值
+     * @param array $type
+     * @return mixed
+     */
+    public function getDefaultValueByType(array $type): mixed {
+        $defaultType = [ 'int' => 0, 'float' => 0.00, 'string' => '', 'array' => [], 'bool' => false, 'null' => null ];
+
+        foreach ($defaultType as $defaultTypeKey => $defaultValue) {
+            if (in_array($defaultTypeKey, $type)) return $defaultValue;
+        }
+
+        return null;
+    }
+
 }
